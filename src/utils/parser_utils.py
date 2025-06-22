@@ -48,14 +48,14 @@ def get_graph_size_args(args):
 
 
 def get_data_args(dataset, args):
-    assert dataset.data.y.ndim == 1  # make sure it is a one class problem
-    args.num_classes = max(np.unique(dataset.data.y.cpu().numpy())) + 1
-    args.num_node_features = dataset.data.x.size(1)
+    assert dataset._data.y.ndim == 1  # make sure it is a one class problem
+    args.num_classes = max(np.unique(dataset._data.y.cpu().numpy())) + 1
+    args.num_node_features = dataset._data.x.size(1)
 
-    if dataset.data.edge_attr.ndim == 1:
-        dataset.data.edge_attr = torch.unsqueeze(dataset.data.edge_attr, 1)
+    if dataset._data.edge_attr.ndim == 1:
+        dataset._data.edge_attr = torch.unsqueeze(dataset._data.edge_attr, 1)
 
-    args.edge_dim = dataset.data.edge_attr.size(1)
+    args.edge_dim = dataset._data.edge_attr.size(1)
     args.datatype = "binary" if args.num_classes == 2 else "multiclass"
     return args
 

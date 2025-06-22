@@ -30,12 +30,12 @@ def main(args, args_group):
         dataset_root=args.data_save_dir,
         **dataset_params,
     )
-    dataset.data.x = dataset.data.x.float()
-    dataset.data.y = dataset.data.y.squeeze().long()
+    dataset._data.x = dataset._data.x.float()
+    dataset._data.y = dataset._data.y.squeeze().long()
     args = get_data_args(dataset, args)
     model_params["edge_dim"] = args.edge_dim
 
-    data_y = dataset.data.y.cpu().numpy()
+    data_y = dataset._data.y.cpu().numpy()
     if args.num_classes == 2:
         y_cf_all = 1 - data_y
     else:
@@ -52,15 +52,15 @@ def main(args, args_group):
         "num_ef": args.edge_dim,
         "avg_num_nodes": np.mean([data.num_nodes for data in dataset])
         if eval(args.graph_classification)
-        else dataset.data.num_nodes,
+        else dataset._data.num_nodes,
         "avg_num_edges": np.mean([data.edge_index.shape[1] for data in dataset])
         if eval(args.graph_classification)
-        else dataset.data.num_edges,
+        else dataset._data.num_edges,
         "avg_degree": np.mean(
             [degree(data.edge_index[0]).mean().item() for data in dataset]
         )
         if eval(args.graph_classification)
-        else degree(dataset.data.edge_index[0]).mean().item(),
+        else degree(dataset._data.edge_index[0]).mean().item(),
         "num_classes": args.num_classes,
     }
     print(info)

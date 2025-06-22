@@ -1,7 +1,7 @@
 import torch
 from torch import default_generator, randperm
 from torch.utils.data import random_split, Subset
-from torch_geometric.data import DataLoader
+from torch_geometric.loader import DataLoader
 from dataset import (
     MoleculeDataset,
     SynGraphDataset,

@@ -33,7 +33,7 @@ from evaluate.mask_utils import (
 from explainer.node_explainer import *
 from explainer.graph_explainer import *
 from pathlib import Path
-from torch_geometric.data import DataLoader
+from torch_geometric.loader import DataLoader
 
 
 class Explain(object):
@@ -49,7 +49,7 @@ class Explain(object):
     ):
         self.model = model
         self.dataset = dataset  # train_mask, eval_mask, test_mask
-        self.data = dataset.data
+        self.data = dataset._data
         self.dataset_name = explainer_params["dataset_name"]
         self.device = device
         self.save = save_dir is not None
@@ -95,7 +95,7 @@ class Explain(object):
             graph = (
                 self.dataset[self.explained_y[i]]
                 if self.graph_classification
-                else self.dataset.data
+                else self.dataset._data
             )
             if (self.dataset_name.startswith(tuple(["ba", "tree"]))) & (
                 not self.graph_classification
@@ -243,7 +243,7 @@ class Explain(object):
             graph = (
                 self.dataset[self.explained_y[i]]
                 if self.graph_classification
-                else self.dataset.data
+                else self.dataset._data
             )
             if (self.dataset_name.startswith(tuple(["ba", "tree"]))) & (
                 not self.graph_classification
@@ -702,7 +702,7 @@ class Explain(object):
             data = next(iter(dataloader)).to(self.device)
             logits = self.model(data)
             pred_labels = logits.argmax(-1).cpu().numpy()[self.list_test_idx]
-            true_labels = self.dataset.data.y.cpu().numpy()[self.list_test_idx]
+            true_labels = self.dataset._data.y.cpu().numpy()[self.list_test_idx]
             if self.pred_type == "correct":
                 list_idx = np.array(self.list_test_idx)[
                     np.where(pred_labels == true_labels)[0].astype(int)
@@ -794,9 +794,9 @@ def explain_main(dataset, model, device, args, unseen=False):
     mask_save_name = get_mask_dir_path(args, device, unseen)
 
     if (args.explained_target is None) | (unseen):
-        list_test_idx = range(0, len(dataset.data.y))
+        list_test_idx = range(0, len(dataset._data.y))
     else:
-        list_test_idx = np.where(dataset.data.y.cpu().numpy() == args.explained_target)[
+        list_test_idx = np.where(dataset._data.y.cpu().numpy() == args.explained_target)[
             0
         ]
     print("Number of explanable entities: ", len(list_test_idx))

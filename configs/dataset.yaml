@@ -4,7 +4,7 @@ bamotif_params: &bamotif_params
   num_layers: 4
   hidden_dim: 64
   num_epochs: 100
-  lr: 0.001
+  lr: 0.0002
   weight_decay: 0.0000
   dropout: 0.0
   readout: "mean"

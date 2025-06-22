@@ -21,7 +21,14 @@ from torch.optim.lr_scheduler import MultiStepLR
 from gnn.model import get_gnnNets
 from sklearn.metrics import balanced_accuracy_score, f1_score
 from torch_geometric.data import Batch
+# import warnings
 
+# warnings.filterwarnings(
+#     action="ignore",
+#     message=r"y_pred contains classes not in y_true",
+#     category=UserWarning,
+#     module=r"sklearn\.metrics\._classification"
+# )
 
 class TrainModel(object):
     def __init__(
@@ -35,6 +42,7 @@ class TrainModel(object):
         **kwargs,
     ):
         self.model = model
+        print(model)
         self.dataset = dataset  # train_mask, eval_mask, test_mask
         self.loader = None
         self.device = device
