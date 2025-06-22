@@ -166,7 +166,7 @@ pip install tqdm matplotlib argparse json jupyterlab notebook pgmpy captum
 ## Run code
 
 ```bash
-python3 code/main.py --dataset_name [dataset-name] --model_name [gnn-model] --explainer_name [explainer-name]
+python3 src/main.py --dataset_name [dataset-name] --model_name [gnn-model] --explainer_name [explainer-name]
 ```
 
 ### Graph Classification
