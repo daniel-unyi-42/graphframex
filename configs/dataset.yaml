@@ -1,3 +1,34 @@
+bamotif_params: &bamotif_params
+  groundtruth: "True"
+  graph_classification: "True"
+  num_layers: 4
+  hidden_dim: 64
+  num_epochs: 100
+  lr: 0.001
+  weight_decay: 0.0000
+  dropout: 0.0
+  readout: "mean"
+  batch_size: 64
+  unseen: "False"
+
+bamotifs:
+  <<: *bamotif_params
+
+baimbalancedmotifs:
+  <<: *bamotif_params
+
+baignoringmotifs:
+  <<: *bamotif_params
+
+baormotifs:
+  <<: *bamotif_params
+
+baxormotifs:
+  <<: *bamotif_params
+
+baandmotifs:
+  <<: *bamotif_params
+
 ba_2motifs:
   groundtruth: "True"
   graph_classification: "True"

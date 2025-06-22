@@ -10,6 +10,7 @@ from .benzene import Benzene
 from .pow_dataset import IEEE24, IEEE39, IEEE118, UK
 from .powcont_dataset import IEEE24Cont, IEEE39Cont, UKCont
 from .powcontrnd_dataset import IEEE24ContRndNc, IEEE39ContRndNc, UKContRndNc
+from .BAMotifs import BAMotifs, BAImbalancedMotifs, BAIgnoringMotifs, BAORMotifs, BAXORMotifs, BAANDMotifs
 
 __all__ = [
     "MoleculeDataset",
@@ -31,4 +32,10 @@ __all__ = [
     "IEEE24ContRndNc",
     "IEEE39ContRndNc",
     "UKContRndNc",
+    "BAMotifs",
+    "BAImbalancedMotifs",
+    "BAIgnoringMotifs",
+    "BAORMotifs",
+    "BAXORMotifs",
+    "BAANDMotifs",
 ]

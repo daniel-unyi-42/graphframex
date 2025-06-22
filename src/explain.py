@@ -178,6 +178,12 @@ class Explain(object):
                         "mutag",
                         "benzene",
                         "mnist",
+                        "bamotifs",
+                        "baimbalancedmotifs",
+                        "baignoringmotifs",
+                        "baormotifs",
+                        "baxormotifs",
+                        "baandmotifs",
                     ]
                 )
             ):
@@ -304,6 +310,12 @@ class Explain(object):
                         "mutag",
                         "benzene",
                         "mnist",
+                        "bamotifs",
+                        "baimbalancedmotifs",
+                        "baignoringmotifs",
+                        "baormotifs",
+                        "baxormotifs",
+                        "baandmotifs",
                     ]
                 )
             ):

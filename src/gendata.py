@@ -22,6 +22,12 @@ from dataset import (
     IEEE24ContRndNc,
     IEEE39ContRndNc,
     UKContRndNc,
+    BAMotifs,
+    BAImbalancedMotifs,
+    BAIgnoringMotifs,
+    BAORMotifs,
+    BAXORMotifs,
+    BAANDMotifs,
 )
 from torch import default_generator
 from utils.parser_utils import arg_parse, get_graph_size_args
@@ -108,6 +114,18 @@ def get_dataset(dataset_root, **kwargs):
             )
         else:
             raise ValueError(f"{dataset_name} is not defined.")
+    elif dataset_name.lower() == "bamotifs":
+        return BAMotifs(root=dataset_root, num_graphs=3000, attach_prob=0.2)
+    elif dataset_name.lower() == "baimbalancedmotifs":
+        return BAImbalancedMotifs(root=dataset_root, num_graphs=3000, attach_prob=0.2)
+    elif dataset_name.lower() == "baignoringmotifs":
+        return BAIgnoringMotifs(root=dataset_root, num_graphs=3000, attach_prob=0.2)
+    elif dataset_name.lower() == "baormotifs":
+        return BAORMotifs(root=dataset_root, num_graphs=3000, attach_prob=0.2)
+    elif dataset_name.lower() == "baxormotifs":
+        return BAXORMotifs(root=dataset_root, num_graphs=3000, attach_prob=0.2)
+    elif dataset_name.lower() == "baandmotifs":
+        return BAANDMotifs(root=dataset_root, num_graphs=3000, attach_prob=0.2)
     else:
         raise ValueError(f"{dataset_name} is not defined.")
 

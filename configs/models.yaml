@@ -1,3 +1,24 @@
+bamotif_params: &bamotif_params
+  num_gc_layers: 4
+  hidden_dim: 64
+  output_dim: 64
+  num_epochs: 500
+  lr: 0.0001
+  weight_decay: 0.0000
+  dropout: 0.0
+bamotifs:
+  <<: *bamotif_params
+baimbalancedmotifs:
+  <<: *bamotif_params
+baignoringmotifs:
+  <<: *bamotif_params
+baormotifs:
+  <<: *bamotif_params
+baxormotifs:
+  <<: *bamotif_params
+baandmotifs:
+  <<: *bamotif_params
+
 ba_house:
   num_gc_layers: 3
   hidden_dim: 20
