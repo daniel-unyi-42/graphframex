@@ -13,9 +13,8 @@ from captum.attr import IntegratedGradients, Saliency
 from torch.autograd import Variable
 from torch_geometric.data import Data
 from torch_geometric.utils import to_networkx, to_dense_adj
-from code.explainer.gnnlrp import GNN_LRP
-from code.explainer.pgexplainer import PGExplainer
-from code.utils.math_utils import sigmoid
+from src.explainer.pgexplainer import PGExplainer
+from src.utils.math_utils import sigmoid
 from utils.gen_utils import (
     filter_existing_edges,
     get_cmn_edges,
@@ -291,20 +290,6 @@ def explain_pgexplainer_graph(model, data, target, device, **kwargs):
     embed = model.get_emb(data=data)
     _, edge_mask = pgexplainer.explain(
         data.x, data.edge_index, data.edge_attr, embed=embed, tmp=1.0, training=False
-    )
-    edge_mask = edge_mask.cpu().detach().numpy()
-    return edge_mask.astype("float"), None
-
-
-def explain_gnnlrp_graph(model, data, target, device, **kwargs):
-    gnnlrp = GNN_LRP(model, explain_graph=True)
-    walks, edge_mask = gnnlrp(
-        data.x,
-        data.edge_index,
-        data.edge_attr,
-        device,
-        explain_graph=True,
-        num_classes=kwargs["num_classes"],
     )
     edge_mask = edge_mask.cpu().detach().numpy()
     return edge_mask.astype("float"), None

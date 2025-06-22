@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv, GATConv, NNConv, GINEConv, TransformerConv
 from torch.nn.parameter import Parameter
-from code.utils.gen_utils import (
+from src.utils.gen_utils import (
     convert_coo_to_tensor,
     from_adj_to_edge_index_torch,
     get_degree_matrix,

@@ -53,7 +53,7 @@ class SynGraphDataset(InMemoryDataset):
         self.name = name.lower()
         self.dataset_params = dataset_params
         super(SynGraphDataset, self).__init__(root, transform, pre_transform)
-        self.data, self.slices = torch.load(self.processed_paths[0])
+        self.data, self.slices = torch.load(self.processed_paths[0], weights_only=False)
 
     @property
     def raw_dir(self):

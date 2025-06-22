@@ -80,7 +80,7 @@ class GSAT(nn.Module):
     def __loss__(self, att, clf_logits, clf_labels, epoch):
         if clf_labels.ndim == 1:
             num_classes = clf_logits.size(1)
-            clf_labels = torch.eye(num_classes)[clf_labels].to(self.device)
+            clf_labels = torch.eye(num_classes)[clf_labels.cpu()].to(self.device)
         pred_loss = self.criterion(clf_logits, clf_labels)
 
         r = self.fix_r if self.fix_r else self.get_r(self.decay_interval, self.decay_r, epoch, final_r=self.final_r, init_r=self.init_r)
@@ -250,7 +250,7 @@ class GSAT(nn.Module):
         precision_at_k = []
         for i in range(batch.max()+1):
             nodes_for_graph_i = batch == i
-            edges_for_graph_i = nodes_for_graph_i[edge_index[0]] & nodes_for_graph_i[edge_index[1]]
+            edges_for_graph_i = (nodes_for_graph_i[edge_index[0]] & nodes_for_graph_i[edge_index[1]]).cpu()
             labels_for_graph_i = exp_labels[edges_for_graph_i]
             mask_log_logits_for_graph_i = att[edges_for_graph_i]
             precision_at_k.append(labels_for_graph_i[np.argsort(-mask_log_logits_for_graph_i)[:k]].sum().item() / k)

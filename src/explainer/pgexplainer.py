@@ -412,12 +412,12 @@ class PGExplainer(nn.Module):
         node_idx = kwargs.get("node_idx")
         nodesize = embed.shape[0]
         if self.explain_graph:
-            col, row = edge_index
+            col, row = edge_index.cpu()
             f1 = embed[col]
             f2 = embed[row]
             f12self = torch.cat([f1, f2], dim=-1)
         else:
-            col, row = edge_index
+            col, row = edge_index.cpu()
             f1 = embed[col]
             f2 = embed[row]
             self_embed = embed[node_idx].repeat(f1.shape[0], 1)

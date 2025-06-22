@@ -1,5 +1,5 @@
 import torch
-from torch_geometric.nn import GNNExplainer
+from torch_geometric.explain import GNNExplainer
 from tqdm import tqdm
 
 EPS = 1e-15
