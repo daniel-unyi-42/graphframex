@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv, GATConv, NNConv, GINEConv, TransformerConv
+from torch_geometric.nn import GCNConv, GATConv, NNConv, GINEConv, TransformerConv, MessagePassing, BatchNorm
 from torch_geometric.data.batch import Batch
 from torch_geometric.nn.glob import global_mean_pool, global_add_pool, global_max_pool
 from src.utils.gen_utils import from_adj_to_edge_index_torch
@@ -9,6 +9,7 @@ from src.utils.gen_utils import from_adj_to_edge_index_torch
 
 def get_gnnNets(input_dim, output_dim, model_params):
     if model_params["model_name"].lower() in [
+        "gnn",
         "gcn",
         "gat",
         "gin",
@@ -20,7 +21,7 @@ def get_gnnNets(input_dim, output_dim, model_params):
         )
     else:
         raise ValueError(
-            f"GNN name should be base, gcn, gat, gin, transformer, but got {model_params['model_name']}"
+            f"GNN name should be base, gnn, gcn, gat, gin, transformer, but got {model_params['model_name']}"
         )
 
 
@@ -237,17 +238,23 @@ class GNN_basic(GNNBase):
     def get_emb(self, *args, **kwargs):
         x, edge_index, edge_attr, edge_weight, _ = self._argsparse(*args, **kwargs)
         for layer in self.convs:
-            x = layer(x, edge_index, edge_attr * edge_weight[:, None])
-            x = F.relu(x)
-            x = F.dropout(x, self.dropout, training=self.training)
+            if isinstance(layer, MessagePassing):
+                x = layer(x, edge_index, edge_attr * edge_weight[:, None])
+            else:
+                x = layer(x)
+            # x = F.relu(x)
+            # x = F.dropout(x, self.dropout, training=self.training)
         return x
 
     def get_graph_rep(self, *args, **kwargs):
         x, edge_index, edge_attr, edge_weight, batch = self._argsparse(*args, **kwargs)
         for layer in self.convs:
-            x = layer(x, edge_index, edge_attr * edge_weight[:, None])
-            x = F.relu(x)
-            x = F.dropout(x, self.dropout, training=self.training)
+            if isinstance(layer, MessagePassing):
+                x = layer(x, edge_index, edge_attr * edge_weight[:, None])
+            else:
+                x = layer(x)
+            # x = F.relu(x)
+            # x = F.dropout(x, self.dropout, training=self.training)
         x = self.readout_layer(x, batch)
         return x
 
@@ -310,6 +317,56 @@ class GCN(GNN_basic):
         return
 
 
+# class GIN(GNN_basic):
+#     def __init__(
+#         self,
+#         input_dim,
+#         output_dim,
+#         model_params,
+#     ):
+#         super().__init__(
+#             input_dim,
+#             output_dim,
+#             model_params,
+#         )
+
+#     def get_layers(self):
+#         self.convs = nn.ModuleList()
+#         current_dim = self.input_dim
+#         for l in range(self.num_layers):
+#             self.convs.append(
+#                 GINEConv(
+#                     nn=nn.Sequential(
+#                         nn.Linear(current_dim, self.hidden_dim),
+#                         nn.ReLU(),
+#                         nn.Linear(self.hidden_dim, self.hidden_dim),
+#                     ),
+#                     edge_dim=self.edge_dim,
+#                 )
+#             )
+#             current_dim = self.hidden_dim
+#         # FC layers
+#         mlp_dim = current_dim * 2 if self.readout == "cat_max_sum" else current_dim
+#         self.mlps = nn.Linear(mlp_dim, self.output_dim)
+#         return
+
+
+class MLPBlock(nn.Module):
+    def __init__(self, in_channels, hidden_channels, out_channels):
+        super().__init__()
+        self.in_channels = in_channels
+        self.hidden_channels = hidden_channels
+        self.out_channels = out_channels
+        self.mlp = nn.Sequential(
+            nn.Linear(in_channels, hidden_channels),
+            nn.LeakyReLU(),
+            nn.Linear(hidden_channels, out_channels),
+        )
+
+    def forward(self, x):
+        return self.mlp(x)
+
+
 class GIN(GNN_basic):
     def __init__(
         self,
@@ -327,20 +384,18 @@ class GIN(GNN_basic):
         self.convs = nn.ModuleList()
         current_dim = self.input_dim
         for l in range(self.num_layers):
-            self.convs.append(
+            self.convs.extend([
                 GINEConv(
-                    nn=nn.Sequential(
-                        nn.Linear(current_dim, self.hidden_dim),
-                        nn.ReLU(),
-                        nn.Linear(self.hidden_dim, self.hidden_dim),
-                    ),
+                    nn=MLPBlock(current_dim, self.hidden_dim, self.hidden_dim),
                     edge_dim=self.edge_dim,
-                )
-            )
+                ),
+                nn.LeakyReLU(),
+                BatchNorm(self.hidden_dim),
+            ])
             current_dim = self.hidden_dim
         # FC layers
         mlp_dim = current_dim * 2 if self.readout == "cat_max_sum" else current_dim
-        self.mlps = nn.Linear(mlp_dim, self.output_dim)
+        self.mlps = MLPBlock(mlp_dim, mlp_dim, self.output_dim)
         return
 
 
