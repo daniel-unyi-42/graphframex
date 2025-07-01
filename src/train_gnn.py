@@ -44,6 +44,12 @@ class TrainModel(object):
         self.model = model
         print(model)
         self.dataset = dataset  # train_mask, eval_mask, test_mask
+        # computing class weights
+        self.class_counts = torch.zeros(dataset.num_classes, device=device)
+        for data in dataset:
+            self.class_counts[data.y] += 1
+        self.class_weights = 1.0 / self.class_counts
+        self.class_weights /= self.class_weights.sum()
         self.loader = None
         self.device = device
         self.graph_classification = graph_classification
@@ -60,7 +66,7 @@ class TrainModel(object):
             self.loader, _, _, _ = get_dataloader(dataset, **dataloader_params)
 
     def __loss__(self, logits, labels):
-        return F.cross_entropy(logits, labels)
+        return F.cross_entropy(logits, labels, weight=self.class_weights)
 
     def _train_batch(self, data, labels):
         logits = self.model(data=data)
