@@ -114,6 +114,7 @@ class Explain(object):
                     top_recall,
                     top_precision,
                     top_balanced_acc,
+                    top_iou_score,
                     top_roc_auc_score,
                 ) = (0, 0, 0, 0, 0)
                 edge_mask = edge_mask.cpu().numpy()
@@ -160,12 +161,16 @@ class Explain(object):
                         top_balanced_acc = sklearn.metrics.balanced_accuracy_score(
                             true_explanation, pred_explanation
                         )
+                        top_iou_score = sklearn.metrics.jaccard_score(
+                            true_explanation, pred_explanation, pos_label=1
+                        )
                     elif y == 0 and label_sum == 0:
                         top_roc_auc_score = np.nan
                         top_precision = np.nan
                         top_recall = np.nan
                         top_f1_score = np.nan
                         top_balanced_acc = np.nan
+                        top_iou_score = np.nan
             elif self.dataset_name.startswith(
                 tuple(
                     [
@@ -192,8 +197,9 @@ class Explain(object):
                     top_recall,
                     top_precision,
                     top_balanced_acc,
+                    top_iou_score,
                     top_roc_auc_score,
-                ) = (np.nan, np.nan, np.nan, np.nan, np.nan)
+                ) = (np.nan, np.nan, np.nan, np.nan, np.nan, np.nan)
                 edge_mask = edge_mask.cpu().numpy()
                 if graph.edge_mask is not None:
                     true_explanation = graph.edge_mask.cpu().numpy()
@@ -222,6 +228,9 @@ class Explain(object):
                         top_balanced_acc = sklearn.metrics.balanced_accuracy_score(
                             true_explanation, pred_explanation
                         )
+                        top_iou_score = sklearn.metrics.jaccard_score(
+                            true_explanation, pred_explanation, pos_label=1
+                        )
             else:
                 raise ValueError("Unknown dataset name: {}".format(self.dataset_name))
             entry = {
@@ -230,6 +239,7 @@ class Explain(object):
                 "top_precision": top_precision,
                 "top_f1_score": top_f1_score,
                 "top_balanced_acc": top_balanced_acc,
+                "top_iou_score": top_iou_score,
             }
             scores.append(entry)
         accuracy_scores = pd.DataFrame.from_dict(list_to_dict(scores))
@@ -259,7 +269,7 @@ class Explain(object):
                 num_explained_y_with_acc += 1
 
             elif self.dataset_name == "ba_multishapes":
-                f1_score, recall, precision, balanced_acc, roc_auc_score = 0, 0, 0, 0, 0
+                f1_score, recall, precision, balanced_acc, iou_score, roc_auc_score = 0, 0, 0, 0, 0, 0
                 edge_mask = edge_mask.cpu().numpy()
 
                 if graph.get("edge_label", None) is None:
@@ -296,6 +306,9 @@ class Explain(object):
                     balanced_acc = sklearn.metrics.balanced_accuracy_score(
                         true_explanation, pred_explanation
                     )
+                    iou_score = sklearn.metrics.jaccard_score(
+                        true_explanation, pred_explanation, pos_label=1
+                    )
                     num_explained_y_with_acc += 1
 
             elif self.dataset_name.startswith(
@@ -319,7 +332,8 @@ class Explain(object):
                     ]
                 )
             ):
-                f1_score, recall, precision, balanced_acc, roc_auc_score = (
+                f1_score, recall, precision, balanced_acc, iou_score, roc_auc_score = (
+                    np.nan,
                     np.nan,
                     np.nan,
                     np.nan,
@@ -352,6 +366,9 @@ class Explain(object):
                         balanced_acc = sklearn.metrics.balanced_accuracy_score(
                             true_explanation, pred_explanation
                         )
+                        top_iou_score = sklearn.metrics.jaccard_score(
+                            true_explanation, pred_explanation, pos_label=1
+                        )
                         num_explained_y_with_acc += 1
             else:
                 raise ValueError("Unknown dataset name: {}".format(self.dataset_name))
@@ -361,6 +378,7 @@ class Explain(object):
                 "precision": precision,
                 "f1_score": f1_score,
                 "balanced_acc": balanced_acc,
+                "iou_score": iou_score,
             }
             scores.append(entry)
         accuracy_scores = pd.DataFrame.from_dict(list_to_dict(scores))
