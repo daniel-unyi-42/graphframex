@@ -9,7 +9,7 @@ import json
 import dill
 import argparse
 from copy import deepcopy
-from captum.attr import IntegratedGradients, Saliency
+# from captum.attr import IntegratedGradients, Saliency
 from torch.autograd import Variable
 from torch_geometric.data import Data
 from torch_geometric.utils import to_networkx, to_dense_adj
@@ -32,7 +32,7 @@ from gnn.model import GCNConv, GATConv, GINEConv, TransformerConv
 from explainer.gnnexplainer import TargetedGNNExplainer
 from explainer.pgmexplainer import Graph_Explainer
 from explainer.subgraphx import SubgraphX
-from explainer.gradcam import GraphLayerGradCam
+# from explainer.gradcam import GraphLayerGradCam
 from explainer.cfgnnexplainer import CFExplainer
 from explainer.graphcfe import GraphCFE, train, test, baseline_cf, add_list_in_dict, compute_counterfactual
 from explainer.gflowexplainer import GFlowExplainer, gflow_parse_args
@@ -236,27 +236,27 @@ def explain_subgraphx_graph(model, data, target, device, **kwargs):
     return edge_mask.astype("float"), None
 
 
-def explain_gradcam_graph(model, data, target, device, **kwargs):
-    # Captum default implementation of LayerGradCam does not average over nodes for different channels because of
-    # different assumptions on tensor shapes
-    input_mask = data.x.clone().requires_grad_(True).to(device)
-    layers = get_all_convolution_layers(model)
-    node_attrs = []
-    for layer in layers:
-        layer_gc = GraphLayerGradCam(model_forward_graph, layer)
-        node_attr = layer_gc.attribute(
-            input_mask,
-            target=target,
-            additional_forward_args=(
-                model,
-                data.edge_index,
-                data.edge_attr,
-            ),
-        )
-        node_attrs.append(node_attr.squeeze().cpu().detach().numpy())
-    node_attr = np.array(node_attrs).mean(axis=0)
-    edge_mask = sigmoid(node_attr_to_edge(data.edge_index, node_attr))
-    return edge_mask.astype("float"), None
+# def explain_gradcam_graph(model, data, target, device, **kwargs):
+#     # Captum default implementation of LayerGradCam does not average over nodes for different channels because of
+#     # different assumptions on tensor shapes
+#     input_mask = data.x.clone().requires_grad_(True).to(device)
+#     layers = get_all_convolution_layers(model)
+#     node_attrs = []
+#     for layer in layers:
+#         layer_gc = GraphLayerGradCam(model_forward_graph, layer)
+#         node_attr = layer_gc.attribute(
+#             input_mask,
+#             target=target,
+#             additional_forward_args=(
+#                 model,
+#                 data.edge_index,
+#                 data.edge_attr,
+#             ),
+#         )
+#         node_attrs.append(node_attr.squeeze().cpu().detach().numpy())
+#     node_attr = np.array(node_attrs).mean(axis=0)
+#     edge_mask = sigmoid(node_attr_to_edge(data.edge_index, node_attr))
+#     return edge_mask.astype("float"), None
 
 
 def explain_pgexplainer_graph(model, data, target, device, **kwargs):
